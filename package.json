@@ -4,7 +4,7 @@
   "description": "![cf](http://i.imgur.com/7v5ASc8.png)  Intro to ExpressJS ===",
   "main": "index.js",
   "scripts": {
-    "start": "env $(cat .env) node server.js",
+    "start": "node server.js",
     "start:watch": "nodemon server.js",
     "test": "mocha",
     "test:watch": "nodemon --exec mocha",
