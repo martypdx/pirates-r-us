@@ -103,7 +103,8 @@ describe( 'auth', () => {
 			return request
 				.post( '/api/auth/signup' )
 				.send( user )
-				.then( res => assert.ok( token = res.body.token ) );
+				.then( res => assert.ok( token = res.body.token ) )
+				.catch(done);
 		});
 
 		it( 'can\'t use same username', done => {

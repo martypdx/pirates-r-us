@@ -19,10 +19,12 @@ component$1.exports = {
 		};
 	},
 	oninit() {
+		// does a token exist?
 		const token = localStorage.token;
 		const loaded = () => this.set( 'loaded', true );
 
 		if (token) {
+			// is this token valid?
 			fetch('/api/auth/validate', {
 				method: 'post',
 				headers: new Headers({
