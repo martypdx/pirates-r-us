@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "start:watch": "nodemon server.js",
-    "test": "MONGODB_URI=mongodb://localhost/pirates-test mocha",
+    "test": "mocha",
     "test:watch": "MONGODB_URI=mongodb://localhost/pirates-test nodemon --exec mocha",
     "build": "rollup -c",
     "build:watch": "nodemon --watch src -e js,html --exec 'npm run build'"

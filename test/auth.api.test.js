@@ -3,6 +3,10 @@ const chaiHttp = require( 'chai-http' );
 const assert = chai.assert;
 chai.use( chaiHttp );
 
+
+const path = require('path');
+// load test env variables
+require('dotenv').load({ path: path.join(__dirname, '.env.test') });
 // start the db...
 const connection = require( '../lib/setup-mongoose' );
 

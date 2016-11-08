@@ -4,6 +4,13 @@
     {{#each pirates}}
     <li><span>{{name}}</span> ({{rank}}) {{crewId.name}}</li>
     {{/each}}
+    <li>
+        <form onsubmit="return false;" on-submit="@this.addNew()">
+            <div>name: <input value="{{pirate.name}}" required></div>
+            <div>rank: <input value="{{pirate.rank}}" required></div>
+            <div><button type="submit">Add</button></div>
+        </form>
+    </li>
 </ul>
 
 <style>
@@ -14,16 +21,41 @@
 
 <script>
 component.exports = {
-    oninit() {
-        const token = this.get( 'user.token' );
-        const headers = new Headers({
+    data: {
+        pirate: null
+    },
+    getHeaders() {
+        const token = this.get('user.token');
+        return new Headers({
 			'Content-Type': 'application/json',
 			Authorization: `Bearer ${token}`
 		});
+    },
+    oninit() {
+        const headers = this.getHeaders();
 
         fetch( '/api/pirates', { headers } )
             .then( res => res.json() )
             .then( pirates => this.set({ pirates }) );
+    },
+    addNew() {
+        const pirate = this.get('pirate');
+        if(!pirate) return;
+        
+        const headers = this.getHeaders();
+
+        fetch( '/api/pirates', { 
+            method: 'post',
+            headers,
+            body: JSON.stringify(pirate) 
+        })
+        .then( res => res.json() )
+        .then( pirate => {
+            this.set('pirate');
+            this.push('pirates', pirate);
+            document.activeElement.blur();
+        });
+
     }
 };
 </script>

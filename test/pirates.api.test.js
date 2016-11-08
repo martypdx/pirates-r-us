@@ -3,8 +3,10 @@ const chaiHttp = require( 'chai-http' );
 const assert = chai.assert;
 chai.use( chaiHttp );
 
-// start the db, and store connection, 
-// so we can clear db
+const path = require('path');
+// load test env variables
+require('dotenv').load({ path: path.join(__dirname, '.env.test') });
+// start the db, and store connection, so we can clear db
 const connection = require( '../lib/setup-mongoose' );
 
 const app = require( '../lib/app' );
@@ -26,7 +28,7 @@ describe( 'pirate', () => {
 			.send({ username: 'testuser', password: 'abc' })
 			.then(res => assert.ok(token = res.body.token))
 			.then(done, done);
-	})
+	});
 
 
 	let luffy = {

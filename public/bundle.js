@@ -95,20 +95,45 @@ var __import0__ = Ractive.extend( component$1.exports );
 var component$2 = { exports: {} };
 
 component$2.exports = {
-    oninit() {
-        const token = this.get( 'user.token' );
-        const headers = new Headers({
+    data: {
+        pirate: null
+    },
+    getHeaders() {
+        const token = this.get('user.token');
+        return new Headers({
 			'Content-Type': 'application/json',
 			Authorization: `Bearer ${token}`
 		});
+    },
+    oninit() {
+        const headers = this.getHeaders();
 
         fetch( '/api/pirates', { headers } )
             .then( res => res.json() )
             .then( pirates => this.set({ pirates }) );
+    },
+    addNew() {
+        const pirate = this.get('pirate');
+        if(!pirate) return;
+        
+        const headers = this.getHeaders();
+
+        fetch( '/api/pirates', { 
+            method: 'post',
+            headers,
+            body: JSON.stringify(pirate) 
+        })
+        .then( res => res.json() )
+        .then( pirate => {
+            this.set('pirate');
+            this.push('pirates', pirate);
+            document.activeElement.blur();
+        });
+
     }
 };
 
-component$2.exports.template = {v:4,t:[{p:[1,1,0],t:7,e:"h2",f:["All Pirates"]}," ",{p:[3,1,22],t:7,e:"ul",f:[{t:4,f:[{p:[5,5,53],t:7,e:"li",f:[{p:[5,9,57],t:7,e:"span",f:[{t:2,r:"name",p:[5,15,63]}]}," (",{t:2,r:"rank",p:[5,32,80]},") ",{t:2,r:"crewId.name",p:[5,42,90]}]}],n:52,r:"pirates",p:[4,5,31]}]}]};
+component$2.exports.template = {v:4,t:[{p:[1,1,0],t:7,e:"h2",f:["All Pirates"]}," ",{p:[3,1,22],t:7,e:"ul",f:[{t:4,f:[{p:[5,5,53],t:7,e:"li",f:[{p:[5,9,57],t:7,e:"span",f:[{t:2,r:"name",p:[5,15,63]}]}," (",{t:2,r:"rank",p:[5,32,80]},") ",{t:2,r:"crewId.name",p:[5,42,90]}]}],n:52,r:"pirates",p:[4,5,31]}," ",{p:[7,5,129],t:7,e:"li",f:[{p:[8,9,142],t:7,e:"form",m:[{n:"onsubmit",f:"return false;",t:13},{n:"submit",f:{x:{r:["@this"],s:"[_0.addNew()]"}},t:70}],f:[{p:[9,13,213],t:7,e:"div",f:["name: ",{p:[9,24,224],t:7,e:"input",m:[{n:"value",f:[{t:2,r:"pirate.name",p:[9,38,238]}],t:13},{n:"required",f:0,t:13}]}]}," ",{p:[10,13,283],t:7,e:"div",f:["rank: ",{p:[10,24,294],t:7,e:"input",m:[{n:"value",f:[{t:2,r:"pirate.rank",p:[10,38,308]}],t:13},{n:"required",f:0,t:13}]}]}," ",{p:[11,13,353],t:7,e:"div",f:[{p:[11,18,358],t:7,e:"button",m:[{n:"type",f:"submit",t:13}],f:["Add"]}]}]}]}]}],e:{"[_0.addNew()]":function (_0){return([_0.addNew()]);}}};
 component$2.exports.css = "span{font-weight:bolder}";
 var __import1__ = Ractive.extend( component$2.exports );
 
