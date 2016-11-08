@@ -1,3 +1,27 @@
-h1 {
+h1, h2, h3 {
 	color: steelblue;
+	font-family: Calibri, 'Trebuchet MS', sans-serif
+}
+
+input[type=radio] {
+	display: none;
+}
+
+.active, .inactive {
+	width: 175px;
+	padding: 0 15px;
+	cursor: pointer;
+	box-sizing: border-box;
+}
+
+.active {
+	border: 1px solid #aaa;
+}
+
+.inactive {
+	opacity: 0.3;
+}
+
+.error {
+	color: red;
 }

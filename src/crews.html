@@ -1,4 +1,4 @@
-<h2>Pirate Crews</h2>
+<h2>Crews!</h2>
 
 <ul>
     {{#each crews}}
@@ -7,6 +7,13 @@
         {{name}} 
     </li>
     {{/each}}
+    <li>
+        <form onsubmit="return false;" on-submit="@this.addNew()">
+            <div>name: <input value="{{crew.name}}" required></div>
+            <div>flag url: <input value="{{crew.flag}}" required></div>
+            <div><button type="submit">Add</button></div>
+        </form>
+    </li>
 </ul>
 
 <style>
@@ -18,17 +25,42 @@
 
 <script>
 component.exports = {
+    data: {
+        crew: null
+    },
     oninit() {
-        const token = this.get('user.token');
-        const headers = new Headers({
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`
-		});
+        const headers = this.getHeaders();
 
         fetch('/api/crews', { headers })
             .then(res => res.json())
             .then(crews => this.set({ crews }))
             .catch(err => console.error(err));
+    },
+    getHeaders() {
+        const token = this.get('user.token');
+        return new Headers({
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`
+		});
+    },
+    addNew() {
+        const crew = this.get('crew');
+        if(!crew) return;
+        
+        const headers = this.getHeaders();
+
+        fetch( '/api/crews', { 
+            method: 'post',
+            headers,
+            body: JSON.stringify(crew) 
+        })
+        .then( res => res.json() )
+        .then( crew => {
+            this.set('crew');
+            this.push('crews', crew);
+            document.activeElement.blur();
+        });
+
     }
 };
 </script>

@@ -6,24 +6,36 @@
 
 {{#if user}}
     <h3>Hello {{user.username}} <span on-click="@this.logout()">logout</span></h3>
-    <crews></crews>
-    <pirates></pirates>
+    <h2>
+        {{#each [ 'pirates', 'crews' ]}}
+        <label class="{{ page === this ? 'active' : 'inactive' }}">
+            {{ this }}
+            <input type="radio" name="{{page}}" value="{{this}}">
+        </label>
+        {{/each}}
+    </h2>
+    {{#if page === 'pirates'}}
+        <pirates></pirates>
+    {{else}}
+        <crews></crews>
+    {{/if}}
 {{else}}
     <auth user="{{user}}"></auth>
 {{/if}}
 
 <style>
-h3 > span {
-    text-decoration: underline;
-    font-size: small;
-    cursor: pointer;
-}
+    h3 > span {
+        text-decoration: underline;
+        font-size: small;
+        cursor: pointer;
+    }
 </style>
 
 <script>
 component.exports = {
     data: {
-        user: undefined 
+        user: undefined,
+        page: 'pirates'
     },
     logout() {
         localStorage.removeItem('token');

@@ -1,8 +1,17 @@
-<h2>All Pirates</h2>
+<h2>Pirates!</h2>
 
 <ul>
     {{#each pirates}}
-    <li><span>{{name}}</span> ({{rank}}) {{crewId.name}}</li>
+    <li>
+        <span>{{.name}}</span> ({{.rank}}) 
+        {{crewId.name}}
+        <select value='{{.crewId}}'>
+            <option selected disabled>Select a crew</option>
+            {{#each crews}}
+                <option value='{{_id}}'>{{name}}</option>
+            {{/each}}
+        </select>
+    </li>
     {{/each}}
     <li>
         <form onsubmit="return false;" on-submit="@this.addNew()">
@@ -22,7 +31,9 @@
 <script>
 component.exports = {
     data: {
-        pirate: null
+        pirate: null,
+        pirates: null,
+        crews: null
     },
     getHeaders() {
         const token = this.get('user.token');
@@ -36,7 +47,27 @@ component.exports = {
 
         fetch( '/api/pirates', { headers } )
             .then( res => res.json() )
-            .then( pirates => this.set({ pirates }) );
+            .then( pirates => this.set({ pirates }) )
+            .catch(err => console.error(err));
+
+        fetch('/api/crews', { headers })
+            .then(res => res.json())
+            .then(crews => this.set({ crews }))
+            .catch(err => console.error(err));
+
+        this.observe('pirates.*.crewId', (crewId, o, k, index) => {
+            const pirateId = this.get('pirates')[index]._id;
+
+            fetch( `/api/crews/${crewId}/pirates/${pirateId}`, { 
+                method: 'put',
+                headers
+            })
+            .then( res => res.json() )
+            .then( pirate => {
+                console.log('pirate updated');
+            })
+            .catch(err => console.error(err));
+        }, { init: false });
     },
     addNew() {
         const pirate = this.get('pirate');
