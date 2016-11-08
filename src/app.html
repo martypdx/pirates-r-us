@@ -1,0 +1,33 @@
+<link rel='ractive' href='./crews.html'>
+<link rel='ractive' href='./pirates.html'>
+<link rel='ractive' href='./auth.html'>
+
+<h1>Pirates!</h1>
+
+{{#if user}}
+    <h3>Hello {{user.username}} <span on-click="@this.logout()">logout</span></h3>
+    <crews></crews>
+    <pirates></pirates>
+{{else}}
+    <auth user="{{user}}"></auth>
+{{/if}}
+
+<style>
+h3 > span {
+    text-decoration: underline;
+    font-size: small;
+    cursor: pointer;
+}
+</style>
+
+<script>
+component.exports = {
+    data: {
+        user: undefined 
+    },
+    logout() {
+        localStorage.removeItem('token');
+        this.set('user');
+    }
+};
+</script>

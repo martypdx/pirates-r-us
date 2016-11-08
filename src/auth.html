@@ -1,0 +1,143 @@
+{{#if loaded}}
+<h2>
+	{{#each [ 'in', 'up' ]}}
+	<label class="{{ type === this ? 'active' : 'inactive' }}">
+		Sign {{ this }}
+		<input type="radio" name="{{type}}" value="{{this}}">
+	</label>
+	{{/each}}
+</h2>
+
+<form on-submit="@this.submit()">
+	<div>
+		<label>
+			User name: <input placeholder="your username" required value="{{credentials.username}}">
+		</label>
+	</div>
+
+	<div>
+		<label>
+			Password: <input required type="{{showPassword ? 'text' : 'password'}}" value="{{credentials.password}}">
+		</label>
+	</div>
+	<div>
+		<label>
+			<input type="checkbox" checked="{{showPassword}}"> show password
+		</label>
+	</div>
+
+	<button type="submit">OK</button>
+</form>
+
+<pre class="error">{{error}}</pre>
+{{/if}}
+
+<style>
+	input[type=radio] {
+		display: none;
+	}
+
+	.active, .inactive {
+		width: 175px;
+		padding: 0 15px;
+		cursor: pointer;
+		box-sizing: border-box;
+	}
+
+	.active {
+		border: 1px solid #aaa;
+	}
+
+	.inactive {
+		opacity: 0.3;
+	}
+
+	.error {
+		color: red;
+	}
+</style>
+
+<script>
+component.exports = {
+	data() {
+		return {
+			loaded: false,
+			type: 'in',
+			showPassword: false,
+			error: null,
+			credentials: {
+				username: '',
+				password: ''
+			}
+		};
+	},
+	oninit() {
+		const token = localStorage.token;
+		const loaded = () => this.set( 'loaded', true );
+
+		if (token) {
+			fetch('/api/auth/validate', {
+				method: 'post',
+				headers: new Headers({
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				})
+			})
+			.then(response => {
+				if(!response.ok) throw new Error('token was not valid');
+				return response.json();
+			})
+			.then(result => {
+				if(!result.valid) throw new Error('token was not valid');
+				return this.getUser(token);
+			})
+			.then(loaded)
+			.catch( err => {
+				console.log( err );
+				localStorage.removeItem('token');
+			});
+		}
+		else loaded(); 
+	},
+	getUser( token ) {
+		const url = '/api/auth/me';
+		const headers = new Headers({
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`
+		});
+
+		return fetch( '/api/users/me', { headers }) 
+			.then( res => {
+                return res.json().then( body => {
+					if( res.status !== 200 ) throw body.error
+					body.token = token;
+				    this.set( 'user', body );
+				});
+			});
+	},
+	submit() {
+		this.event.original.preventDefault();
+		this.set('error');
+		const url = `/api/auth/sign${this.get('type')}`;
+		const credentials = this.get( 'credentials' );
+		const options = { 
+			method: 'POST', 
+			body: JSON.stringify( this.get( 'credentials' ) ),
+			headers: new Headers({
+				'Content-Type': 'application/json'
+			})
+		};
+
+		fetch( url, options )
+			.then( res => {
+				return res.json().then( body => {
+					if( res.status !== 200 ) throw body.error
+					const { token } = body;
+					localStorage.token = token;
+					this.getUser( token );
+				})
+			})
+			.catch( err => this.set( 'error', err ) );
+	}
+};
+</script>

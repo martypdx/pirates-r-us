@@ -1,0 +1,34 @@
+<h2>Pirate Crews</h2>
+
+<ul>
+    {{#each crews}}
+    <li>
+        <img class="flag" src="{{flag}}">
+        {{name}} 
+    </li>
+    {{/each}}
+</ul>
+
+<style>
+    .flag {
+        height: 50px;
+        width: auto;
+    }
+</style>
+
+<script>
+component.exports = {
+    oninit() {
+        const token = this.get('user.token');
+        const headers = new Headers({
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`
+		});
+
+        fetch('/api/crews', { headers })
+            .then(res => res.json())
+            .then(crews => this.set({ crews }))
+            .catch(err => console.error(err));
+    }
+};
+</script>

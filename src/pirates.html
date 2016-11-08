@@ -1,0 +1,29 @@
+<h2>All Pirates</h2>
+
+<ul>
+    {{#each pirates}}
+    <li><span>{{name}}</span> ({{rank}}) {{crewId.name}}</li>
+    {{/each}}
+</ul>
+
+<style>
+    span {
+        font-weight: bolder;
+    }
+</style>
+
+<script>
+component.exports = {
+    oninit() {
+        const token = this.get( 'user.token' );
+        const headers = new Headers({
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`
+		});
+
+        fetch( '/api/pirates', { headers } )
+            .then( res => res.json() )
+            .then( pirates => this.set({ pirates }) );
+    }
+};
+</script>
